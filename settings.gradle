@@ -1,1 +1,1 @@
-include ':app', ':gradientbutton'
+include ':example', ':gradientbutton'
