@@ -14,5 +14,7 @@
         <attr name="gradient_colors" format="string" />
         <attr name="stroke" format="dimension" />
         <attr name="filled" format="boolean" />
+        <attr name="round" format="boolean" />
+        <attr name="fill_color" format="color" />
     </declare-styleable>
 </resources>

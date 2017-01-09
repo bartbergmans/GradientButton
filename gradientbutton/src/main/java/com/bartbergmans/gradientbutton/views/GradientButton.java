@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
@@ -31,6 +32,10 @@ public class GradientButton extends AppCompatButton {
     private boolean mFilled;
     private GradientDrawable.Orientation mOrientation;
     private int[] mGradientColors;
+    private boolean mRound;
+    private int mBackgroundColor;
+
+    private Path mPath;
 
     public GradientButton(Context context) {
         super(context);
@@ -81,37 +86,69 @@ public class GradientButton extends AppCompatButton {
 
         mGradientColors = new int[]{Color.GREEN, Color.BLUE};
 
+        mRound = a.getBoolean(R.styleable.GradientButton_round, false);
+
+        mBackgroundColor = a.getColor(R.styleable.GradientButton_fill_color, Color.TRANSPARENT);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        setBackground(getBackgroundDrawable(canvas));
+        if (mRound && getHeight() > getWidth()) {
+            setWidth(getHeight());
+        } else if (mRound && getWidth() > getHeight()) {
+            setHeight(getWidth());
+        }
+
+        // TODO: Add ripple effect like test_ripple.xml in the Example project
+        setBackground(getBackgroundDrawable());
 
         super.onDraw(canvas);
     }
 
-    protected Drawable getBackgroundDrawable(Canvas canvas) {
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        if (mPath != null) {
+            canvas.clipPath(mPath);
+        }
+        super.dispatchDraw(canvas);
+    }
+
+    protected Drawable getBackgroundDrawable() {
         GradientDrawable backgroundDrawable = new GradientDrawable(
                 mOrientation,
                 mGradientColors);
-        backgroundDrawable.setCornerRadius(canvas.getHeight() / 2);
+        backgroundDrawable.setCornerRadius(getHeight() / 2);
         backgroundDrawable.setShape(GradientDrawable.RECTANGLE);
 
+        mPath = new Path();
+        mPath.addRoundRect(
+                new RectF(0, 0, getWidth(), getHeight()),
+                getHeight() / 2, getHeight() / 2, Path.Direction.CW);
+
         if (!mFilled) {
-            Bitmap background = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+            Bitmap background = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
             Canvas backgroundCanvas = new Canvas(background);
             backgroundCanvas.drawARGB(0, 0, 0, 0);
-            backgroundDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            backgroundDrawable.setBounds(0, 0, getWidth(), getHeight());
             backgroundDrawable.draw(backgroundCanvas);
 
             Paint rectPaint = new Paint();
             rectPaint.setAntiAlias(true);
             rectPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
             backgroundCanvas.drawRoundRect(new RectF(mStroke, mStroke,
-                            canvas.getWidth() - mStroke,
-                            canvas.getHeight() - mStroke),
-                    canvas.getHeight() / 2,
-                    canvas.getHeight() / 2,
+                            getWidth() - mStroke,
+                            getHeight() - mStroke),
+                    getHeight() / 2,
+                    getHeight() / 2,
+                    rectPaint);
+
+            rectPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
+            rectPaint.setColor(mBackgroundColor);
+            backgroundCanvas.drawRoundRect(new RectF(mStroke, mStroke,
+                            getWidth() - mStroke,
+                            getHeight() - mStroke),
+                    getHeight() / 2,
+                    getHeight() / 2,
                     rectPaint);
 
             return new BitmapDrawable(getResources(), background);
