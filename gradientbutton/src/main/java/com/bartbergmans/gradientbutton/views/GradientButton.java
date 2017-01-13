@@ -1,23 +1,38 @@
 package com.bartbergmans.gradientbutton.views;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.Xfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RoundRectShape;
+import android.os.Build;
+import android.support.annotation.IntDef;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.Button;
 
 import com.bartbergmans.gradientbutton.R;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 
 /**
  * A {@link Button} that has a gradient background or stroke.
@@ -26,134 +41,155 @@ import com.bartbergmans.gradientbutton.R;
  */
 public class GradientButton extends AppCompatButton {
 
-    private final static String TAG = "GradientButton";
+    private final static String TAG = GradientButton.class.getSimpleName();
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({TOP_BOTTOM, TR_BL, RIGHT_LEFT, BR_TL, BOTTOM_TOP, BL_TR, LEFT_RIGHT, TL_BR})
+    public @interface Orientation {}
+    public static final int TOP_BOTTOM = 0;
+    public static final int TR_BL      = 1;
+    public static final int RIGHT_LEFT = 2;
+    public static final int BR_TL      = 3;
+    public static final int BOTTOM_TOP = 4;
+    public static final int BL_TR      = 5;
+    public static final int LEFT_RIGHT = 6;
+    public static final int TL_BR      = 7;
+
+    private boolean isCircular;
+    private boolean isFilled;
 
     private int mStroke;
-    private boolean mFilled;
-    private GradientDrawable.Orientation mOrientation;
-    private int[] mGradientColors;
-    private boolean mRound;
+    private int mRippleColor;
     private int mBackgroundColor;
+    @Orientation private int mOrientation;
 
-    private Path mPath;
+    private int[] mGradient;
 
     public GradientButton(Context context) {
-        super(context);
-
-        mStroke = 0;
-        mFilled = false;
-        mGradientColors = new int[]{0xFF616261, 0xFF131313};
-        mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
+        this(context, null);
     }
 
     public GradientButton(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
+    }
 
-        TypedArray a = context.getTheme().obtainStyledAttributes(
-                attrs,
-                R.styleable.GradientButton,
-                0, 0);
+    public GradientButton(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+
+        setDefaultRippleColor(context);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.GradientButton);
+
+        isFilled = a.getBoolean(R.styleable.GradientButton_filled, false);
+        isCircular = a.getBoolean(R.styleable.GradientButton_circular, false);
 
         mStroke = a.getDimensionPixelSize(R.styleable.GradientButton_stroke, 0);
-        mFilled = a.getBoolean(R.styleable.GradientButton_filled, true);
-        switch (a.getInteger(R.styleable.GradientButton_orientation, 0)) {
-            case 0:
-            default:
-                mOrientation = GradientDrawable.Orientation.TOP_BOTTOM;
-                break;
-            case 1:
-                mOrientation = GradientDrawable.Orientation.TR_BL;
-                break;
-            case 2:
-                mOrientation = GradientDrawable.Orientation.RIGHT_LEFT;
-                break;
-            case 3:
-                mOrientation = GradientDrawable.Orientation.BR_TL;
-                break;
-            case 4:
-                mOrientation = GradientDrawable.Orientation.BOTTOM_TOP;
-                break;
-            case 5:
-                mOrientation = GradientDrawable.Orientation.BL_TR;
-                break;
-            case 6:
-                mOrientation = GradientDrawable.Orientation.LEFT_RIGHT;
-                break;
-            case 7:
-                mOrientation = GradientDrawable.Orientation.TL_BR;
-                break;
-        }
-
-        mGradientColors = new int[]{Color.GREEN, Color.BLUE};
-
-        mRound = a.getBoolean(R.styleable.GradientButton_round, false);
-
         mBackgroundColor = a.getColor(R.styleable.GradientButton_fill_color, Color.TRANSPARENT);
-    }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        if (mRound && getHeight() > getWidth()) {
-            setWidth(getHeight());
-        } else if (mRound && getWidth() > getHeight()) {
-            setHeight(getWidth());
-        }
+        @Orientation
+        int orientation = a.getInt(R.styleable.GradientButton_orientation, TOP_BOTTOM);
+        mOrientation = orientation;
 
-        // TODO: Add ripple effect like test_ripple.xml in the Example project
-        setBackground(getBackgroundDrawable());
+        if(a.hasValue(R.styleable.GradientButton_gradient)) {
+            final int id = a.getResourceId(R.styleable.GradientButton_gradient, 0);
 
-        super.onDraw(canvas);
-    }
+            int[] values = getResources().getIntArray(id);
 
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        if (mPath != null) {
-            canvas.clipPath(mPath);
-        }
-        super.dispatchDraw(canvas);
-    }
-
-    protected Drawable getBackgroundDrawable() {
-        GradientDrawable backgroundDrawable = new GradientDrawable(
-                mOrientation,
-                mGradientColors);
-        backgroundDrawable.setCornerRadius(getHeight() / 2);
-        backgroundDrawable.setShape(GradientDrawable.RECTANGLE);
-
-        mPath = new Path();
-        mPath.addRoundRect(
-                new RectF(0, 0, getWidth(), getHeight()),
-                getHeight() / 2, getHeight() / 2, Path.Direction.CW);
-
-        if (!mFilled) {
-            Bitmap background = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas backgroundCanvas = new Canvas(background);
-            backgroundCanvas.drawARGB(0, 0, 0, 0);
-            backgroundDrawable.setBounds(0, 0, getWidth(), getHeight());
-            backgroundDrawable.draw(backgroundCanvas);
-
-            Paint rectPaint = new Paint();
-            rectPaint.setAntiAlias(true);
-            rectPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-            backgroundCanvas.drawRoundRect(new RectF(mStroke, mStroke,
-                            getWidth() - mStroke,
-                            getHeight() - mStroke),
-                    getHeight() / 2,
-                    getHeight() / 2,
-                    rectPaint);
-
-            rectPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
-            rectPaint.setColor(mBackgroundColor);
-            backgroundCanvas.drawRoundRect(new RectF(mStroke, mStroke,
-                            getWidth() - mStroke,
-                            getHeight() - mStroke),
-                    getHeight() / 2,
-                    getHeight() / 2,
-                    rectPaint);
-
-            return new BitmapDrawable(getResources(), background);
+            mGradient = new int[values.length];
+            for(int i = 0; i < values.length; i++) {
+                mGradient[i] = ContextCompat.getColor(context, values[i]);
+            }
         } else {
-            return backgroundDrawable;
+            mGradient = new int[] {
+                    a.getColor(R.styleable.GradientButton_start_color, Color.BLUE),
+                    a.getColor(R.styleable.GradientButton_end_color, Color.GREEN)
+            };
+        }
+
+        a.recycle();
+    }
+
+    private void setDefaultRippleColor(Context context) {
+        int[] attrs = new int[] { R.attr.colorControlHighlight };
+        TypedArray a = context.obtainStyledAttributes(attrs);
+
+        mRippleColor = a.getColor(0, Color.RED);
+
+        a.recycle();
+    }
+
+    @Override
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        setBackground(createBackgroundDrawable(width, height));
+    }
+
+    private Drawable createBackgroundDrawable(int width, int height) {
+        Drawable content = createContentDrawable(width, height);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Log.d(TAG, "RIPPLE APPLIED, with color: " + mRippleColor);
+            Drawable mask = createMaskDrawable(width, height);
+            ColorStateList stateList = ColorStateList.valueOf(mRippleColor);
+            return new RippleDrawable(stateList, content, mask);
+        } else {
+            return content;
         }
     }
+
+    private Drawable createMaskDrawable(int width, int height) {
+        float[] outerRadii = new float[8];
+        Arrays.fill(outerRadii, height / 2);
+
+        RoundRectShape shape = new RoundRectShape(outerRadii, null, null);
+        return new ShapeDrawable(shape);
+    }
+
+    private Drawable createContentDrawable(int width, int height) {
+        int radius = height / 2;
+
+        Paint paint = new Paint();
+        paint.setDither(true);
+        paint.setShader(createGradient(width, height));
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawRoundRect(new RectF(0, 0, width, height), radius, radius, paint);
+
+        if(!isFilled) {
+            Paint background = new Paint();
+            background.setAntiAlias(true);
+            background.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            background.setColor(mBackgroundColor);
+
+            int innerRadius = (height - mStroke) / 2;
+            canvas.drawRoundRect(new RectF(mStroke, mStroke, width - mStroke, height - mStroke),
+                    innerRadius, innerRadius, background);
+        }
+
+        return new BitmapDrawable(getResources(), bitmap);
+    }
+
+    private LinearGradient createGradient(int width, int height) {
+        Shader.TileMode mode = Shader.TileMode.CLAMP;
+        switch (mOrientation) {
+            default:
+            case TOP_BOTTOM:
+                return new LinearGradient(width / 2, 0, width / 2, height, mGradient, null, mode);
+            case TR_BL:
+                return new LinearGradient(width, 0, 0, height, mGradient, null, mode);
+            case RIGHT_LEFT:
+                return new LinearGradient(width, height / 2, 0, height / 2, mGradient, null, mode);
+            case BR_TL:
+                return new LinearGradient(width, height, 0, 0, mGradient, null, mode);
+            case BOTTOM_TOP:
+                return new LinearGradient(width / 2, height, width / 2, 0, mGradient, null, mode);
+            case BL_TR:
+                return new LinearGradient(0, height, width, 0, mGradient, null, mode);
+            case LEFT_RIGHT:
+                return new LinearGradient(0, height / 2, width, height / 2, mGradient, null, mode);
+            case TL_BR:
+                return new LinearGradient(0, 0, width, height, mGradient, null, mode);
+        }
+    }
+
 }

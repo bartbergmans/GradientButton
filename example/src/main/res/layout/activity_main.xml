@@ -17,12 +17,13 @@
         android:layout_marginBottom="20dp">
 
         <com.bartbergmans.gradientbutton.views.GradientButton
+            android:id="@+id/gradient_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:text="@string/app_name"
             app:filled="false"
-            app:orientation="BR_TL"
+            app:orientation="br_tl"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
@@ -30,9 +31,10 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:text="@string/app_name"
+            android:clickable="true"
             app:fill_color="@android:color/holo_orange_light"
             app:filled="false"
-            app:orientation="BR_TL"
+            app:orientation="br_tl"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
@@ -41,7 +43,7 @@
             android:text="@string/app_name"
             android:textColor="@android:color/white"
             app:filled="true"
-            app:orientation="BR_TL"
+            app:orientation="br_tl"
             app:stroke="3dp" />
     </LinearLayout>
 
@@ -56,8 +58,8 @@
             android:layout_marginEnd="20dp"
             android:text="@string/app_name"
             app:filled="false"
-            app:orientation="BR_TL"
-            app:round="true"
+            app:orientation="br_tl"
+            app:circular="true"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
@@ -67,8 +69,8 @@
             android:text="@string/app_name"
             app:fill_color="@android:color/holo_orange_light"
             app:filled="false"
-            app:orientation="BR_TL"
-            app:round="true"
+            app:orientation="br_tl"
+            app:circular="true"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
@@ -77,8 +79,8 @@
             android:text="@string/app_name"
             android:textColor="@android:color/white"
             app:filled="true"
-            app:orientation="BR_TL"
-            app:round="true"
+            app:orientation="br_tl"
+            app:circular="true"
             app:stroke="3dp" />
     </LinearLayout>
 
