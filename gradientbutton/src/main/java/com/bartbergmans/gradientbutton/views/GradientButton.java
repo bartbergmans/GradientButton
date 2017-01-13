@@ -8,15 +8,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Shader;
-import android.graphics.Xfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
@@ -41,11 +38,6 @@ import java.util.Arrays;
  */
 public class GradientButton extends AppCompatButton {
 
-    private final static String TAG = GradientButton.class.getSimpleName();
-
-    @Retention(RetentionPolicy.SOURCE)
-    @IntDef({TOP_BOTTOM, TR_BL, RIGHT_LEFT, BR_TL, BOTTOM_TOP, BL_TR, LEFT_RIGHT, TL_BR})
-    public @interface Orientation {}
     public static final int TOP_BOTTOM = 0;
     public static final int TR_BL      = 1;
     public static final int RIGHT_LEFT = 2;
@@ -54,15 +46,13 @@ public class GradientButton extends AppCompatButton {
     public static final int BL_TR      = 5;
     public static final int LEFT_RIGHT = 6;
     public static final int TL_BR      = 7;
-
+    private final static String TAG = GradientButton.class.getSimpleName();
     private boolean isCircular;
     private boolean isFilled;
-
     private int mStroke;
     private int mRippleColor;
     private int mBackgroundColor;
     @Orientation private int mOrientation;
-
     private int[] mGradient;
 
     public GradientButton(Context context) {
@@ -70,7 +60,7 @@ public class GradientButton extends AppCompatButton {
     }
 
     public GradientButton(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, android.support.v7.appcompat.R.attr.buttonStyle);
     }
 
     public GradientButton(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -124,6 +114,12 @@ public class GradientButton extends AppCompatButton {
     }
 
     private Drawable createBackgroundDrawable(int width, int height) {
+        if (isCircular && height > width) {
+            width = height;
+        } else if (isCircular && width > height) {
+            height = width;
+        }
+
         Drawable content = createContentDrawable(width, height);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -190,6 +186,11 @@ public class GradientButton extends AppCompatButton {
             case TL_BR:
                 return new LinearGradient(0, 0, width, height, mGradient, null, mode);
         }
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({TOP_BOTTOM, TR_BL, RIGHT_LEFT, BR_TL, BOTTOM_TOP, BL_TR, LEFT_RIGHT, TL_BR})
+    public @interface Orientation {
     }
 
 }
