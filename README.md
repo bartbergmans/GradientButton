@@ -5,6 +5,8 @@
 
 Gradient buttons
 
+<img alt="GradientButton" src="http://i.imgur.com/8a8c2rJ.png" width="450">
+
 # Gradle
 
 Add the following to your project level build.gradle:
