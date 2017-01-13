@@ -21,29 +21,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:text="@string/app_name"
+            android:clickable="true"
+            android:text="@string/button_text"
+            app:end_color="@color/gradientEnd"
             app:filled="false"
-            app:orientation="br_tl"
+            app:orientation="top_bottom"
+            app:start_color="@color/gradientStart"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:text="@string/app_name"
             android:clickable="true"
-            app:fill_color="@android:color/holo_orange_light"
+            android:text="@string/button_text"
+            app:end_color="@color/gradientEnd"
+            app:fill_color="@color/fillColor"
             app:filled="false"
-            app:orientation="br_tl"
+            app:orientation="top_bottom"
+            app:start_color="@color/gradientStart"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
+            android:text="@string/button_text"
             android:textColor="@android:color/white"
+            app:end_color="@color/gradientEnd"
             app:filled="true"
-            app:orientation="br_tl"
+            app:orientation="top_bottom"
+            app:start_color="@color/gradientStart"
             app:stroke="3dp" />
     </LinearLayout>
 
@@ -56,43 +63,37 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:text="@string/app_name"
-            app:filled="false"
-            app:orientation="br_tl"
+            android:text="@string/button_text"
             app:circular="true"
+            app:end_color="@color/gradientEnd"
+            app:filled="false"
+            app:orientation="top_bottom"
+            app:start_color="@color/gradientStart"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
-            android:text="@string/app_name"
-            app:fill_color="@android:color/holo_orange_light"
-            app:filled="false"
-            app:orientation="br_tl"
+            android:text="@string/button_text"
             app:circular="true"
+            app:end_color="@color/gradientEnd"
+            app:fill_color="@color/fillColor"
+            app:filled="false"
+            app:orientation="top_bottom"
+            app:start_color="@color/gradientStart"
             app:stroke="3dp" />
 
         <com.bartbergmans.gradientbutton.views.GradientButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
+            android:text="@string/button_text"
             android:textColor="@android:color/white"
-            app:filled="true"
-            app:orientation="br_tl"
             app:circular="true"
+            app:end_color="@color/gradientEnd"
+            app:filled="true"
+            app:orientation="top_bottom"
+            app:start_color="@color/gradientStart"
             app:stroke="3dp" />
     </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/test_ripple"
-        android:text="@string/app_name" />
-
-    <Button
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:background="@drawable/test_ripple"
-        android:text="@string/app_name" />
 </LinearLayout>

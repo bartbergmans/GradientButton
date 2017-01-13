@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Example</string>
+    <string name="app_name">GradientButton</string>
+    <string name="button_text">Click!</string>
 </resources>

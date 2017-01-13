@@ -144,6 +144,7 @@ public class GradientButton extends AppCompatButton {
         int radius = height / 2;
 
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
         paint.setDither(true);
         paint.setShader(createGradient(width, height));
 
