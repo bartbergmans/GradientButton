@@ -1,6 +1,7 @@
 # GradientButton
 
 [![](https://jitpack.io/v/bartbergmans/GradientButton.svg)](https://jitpack.io/#bartbergmans/GradientButton)
+[![Android Arsenal]( https://img.shields.io/badge/Android%20Arsenal-GradientButton-green.svg?style=flat )]( https://android-arsenal.com/details/1/7734 )
 
 Gradient buttons
 
