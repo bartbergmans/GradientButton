@@ -22,6 +22,6 @@ allprojects {
 Add this to your app build.gradle:
 <pre>
 dependencies {
-    compile 'com.github.bartbergmans:GradientButton:0.1'
+    compile 'com.github.bartbergmans:GradientButton:1.0.0'
 }
 </pre>
